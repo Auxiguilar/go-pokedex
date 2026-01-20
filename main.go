@@ -7,19 +7,24 @@ import (
 )
 
 func main() {
+	availableCmds := getCommands()
 	scanner := bufio.NewScanner(os.Stdin)
 
 	for {
 		fmt.Print("pokedex > ")
 		scanner.Scan()
 		input := scanner.Text()
-		cleanedInput := cleanInput(input)
 
+		cleanedInput := cleanInput(input)
 		if cleanedInput == nil {
-			fmt.Println("invalid input")
+			continue
 		}
 
-		firstWord := cleanedInput[0]
-		fmt.Printf("Your command was: %s\n", firstWord)
+		userCmd := cleanedInput[0]
+		if cmd, ok := availableCmds[userCmd]; ok {
+			cmd.callback()
+		} else {
+			fmt.Println("Unknown command")
+		}
 	}
 }
