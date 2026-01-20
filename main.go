@@ -22,7 +22,10 @@ func main() {
 
 		userCmd := cleanedInput[0]
 		if cmd, ok := availableCmds[userCmd]; ok {
-			cmd.callback()
+			err := cmd.callback()
+			if err != nil {
+				fmt.Println(err)
+			}
 		} else {
 			fmt.Println("Unknown command")
 		}

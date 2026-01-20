@@ -30,19 +30,25 @@ func getCommands() map[string]cliCommand {
 }
 
 func commandExit() error {
-	fmt.Println("Closing the Pokedex... Goodbye!")
+	_, err := fmt.Println("Closing the Pokedex... Goodbye!")
 
 	os.Exit(0)
-	return nil
+	return err
 }
 
 func commandHelp() error {
-	fmt.Printf("Welcome to the Pokedex!\nUsage:\n\n")
+	_, err := fmt.Printf("Welcome to the Pokedex!\nUsage:\n\n")
+	if err != nil {
+		return err
+	}
 
 	availableCmds := getCommands()
 
 	for _, cmd := range availableCmds {
-		fmt.Printf("%s: %s\n", cmd.name, cmd.description)
+		_, err := fmt.Printf("%s: %s\n", cmd.name, cmd.description)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
