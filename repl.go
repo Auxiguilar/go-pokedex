@@ -1,58 +1,11 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"strings"
 )
-
-type cliCommand struct {
-	name        string
-	description string
-	callback    func() error
-}
-
-func getCommands() map[string]cliCommand {
-	var commands = map[string]cliCommand{
-		"exit": {
-			name:        "exit",
-			description: "Exit the pokedex",
-			callback:    commandExit,
-		},
-		"help": {
-			name:        "help",
-			description: "Get help",
-			callback:    commandHelp,
-		},
-	}
-
-	return commands
-}
-
-func commandExit() error {
-	_, err := fmt.Println("Closing the Pokedex... Goodbye!")
-
-	os.Exit(0)
-	return err
-}
-
-func commandHelp() error {
-	_, err := fmt.Printf("Welcome to the Pokedex!\nUsage:\n\n")
-	if err != nil {
-		return err
-	}
-
-	availableCmds := getCommands()
-
-	for _, cmd := range availableCmds {
-		_, err := fmt.Printf("%s: %s\n", cmd.name, cmd.description)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
 
 func cleanInput(text string) []string {
 	text = strings.TrimSpace(text)
@@ -67,4 +20,37 @@ func cleanInput(text string) []string {
 	}
 
 	return result
+}
+
+func startRepl() {
+	availableCmds := getCommands()
+	scanner := bufio.NewScanner(os.Stdin)
+
+	areaStartLink := "https://pokeapi.co/api/v2/location-area/"
+
+	currentArea := config{
+		Next:     &areaStartLink,
+		Previous: nil,
+	}
+
+	for {
+		fmt.Print("pokedex > ")
+		scanner.Scan()
+		input := scanner.Text()
+
+		cleanedInput := cleanInput(input)
+		if cleanedInput == nil {
+			continue
+		}
+
+		userCmd := cleanedInput[0]
+		if cmd, ok := availableCmds[userCmd]; ok {
+			err := cmd.callback(&currentArea)
+			if err != nil {
+				fmt.Println(err)
+			}
+		} else {
+			fmt.Println("Unknown command")
+		}
+	}
 }
