@@ -1,4 +1,4 @@
-package main
+package pokeapi
 
 import (
 	"encoding/json"
@@ -16,7 +16,7 @@ type areaData struct {
 	} `json:"results"`
 }
 
-func getAreaData(url string) (areaData, error) {
+func GetAreaData(url string) (areaData, error) {
 	res, err := http.Get(url)
 	if err != nil {
 		return areaData{}, err

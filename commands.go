@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"os"
+
+	"github.com/Auxiguilar/go-pokedex/internal/pokeapi"
 )
 
 type cliCommand struct {
@@ -77,7 +79,7 @@ func commandMap(c *config) error {
 	}
 
 	// is it dereferencing??
-	data, err := getAreaData(*c.Next)
+	data, err := pokeapi.GetAreaData(*c.Next)
 	if err != nil {
 		return err
 	}
@@ -102,7 +104,7 @@ func commandMapB(c *config) error {
 		return err
 	}
 
-	data, err := getAreaData(*c.Previous)
+	data, err := pokeapi.GetAreaData(*c.Previous)
 	if err != nil {
 		return err
 	}
