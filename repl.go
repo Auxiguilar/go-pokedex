@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"net/http"
 	"os"
 	"strings"
 
@@ -29,13 +28,7 @@ func startRepl() {
 	availableCmds := getCommands()
 	scanner := bufio.NewScanner(os.Stdin)
 
-	areaStartLink := "https://pokeapi.co/api/v2/location-area/"
-
-	config := pokeapi.Config{
-		Client:      http.Client{},
-		UrlNext:     &areaStartLink,
-		UrlPrevious: nil,
-	}
+	config := pokeapi.NewConfig()
 
 	for {
 		fmt.Print("pokedex > ")

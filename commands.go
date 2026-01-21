@@ -14,7 +14,7 @@ type cliCommand struct {
 }
 
 func getCommands() map[string]cliCommand {
-	var commands = map[string]cliCommand{
+	return map[string]cliCommand{
 		"exit": {
 			name:        "exit",
 			description: "Exit the pokedex",
@@ -36,8 +36,6 @@ func getCommands() map[string]cliCommand {
 			callback:    commandMapB,
 		},
 	}
-
-	return commands
 }
 
 func commandExit(cfg *pokeapi.Config) error {
