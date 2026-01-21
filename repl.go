@@ -3,8 +3,11 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"net/http"
 	"os"
 	"strings"
+
+	"github.com/Auxiguilar/go-pokedex/internal/pokeapi"
 )
 
 func cleanInput(text string) []string {
@@ -28,9 +31,10 @@ func startRepl() {
 
 	areaStartLink := "https://pokeapi.co/api/v2/location-area/"
 
-	currentArea := config{
-		Next:     &areaStartLink,
-		Previous: nil,
+	config := pokeapi.Config{
+		Client:      http.Client{},
+		UrlNext:     &areaStartLink,
+		UrlPrevious: nil,
 	}
 
 	for {
@@ -45,7 +49,7 @@ func startRepl() {
 
 		userCmd := cleanedInput[0]
 		if cmd, ok := availableCmds[userCmd]; ok {
-			err := cmd.callback(&currentArea)
+			err := cmd.callback(&config)
 			if err != nil {
 				fmt.Println(err)
 			}

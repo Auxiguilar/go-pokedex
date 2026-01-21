@@ -10,13 +10,7 @@ import (
 type cliCommand struct {
 	name        string
 	description string
-	callback    func(*config) error
-}
-
-// contains the next and previous urls for map command
-type config struct {
-	Next     *string
-	Previous *string
+	callback    func(*pokeapi.Config) error
 }
 
 func getCommands() map[string]cliCommand {
@@ -28,17 +22,17 @@ func getCommands() map[string]cliCommand {
 		},
 		"help": {
 			name:        "help",
-			description: "Get help",
+			description: "Display available commands",
 			callback:    commandHelp,
 		},
 		"map": {
 			name:        "map",
-			description: "Map the world!",
+			description: "Get the next page of areas",
 			callback:    commandMap,
 		},
 		"mapb": {
 			name:        "mapb",
-			description: "!dlrow eht paM",
+			description: "Get the previous page of areas",
 			callback:    commandMapB,
 		},
 	}
@@ -46,14 +40,14 @@ func getCommands() map[string]cliCommand {
 	return commands
 }
 
-func commandExit(c *config) error {
+func commandExit(cfg *pokeapi.Config) error {
 	_, err := fmt.Println("Closing the Pokedex... Goodbye!")
 
 	os.Exit(0)
 	return err
 }
 
-func commandHelp(c *config) error {
+func commandHelp(cfg *pokeapi.Config) error {
 	_, err := fmt.Printf("Welcome to the Pokedex!\nUsage:\n\n")
 	if err != nil {
 		return err
@@ -71,15 +65,13 @@ func commandHelp(c *config) error {
 	return nil
 }
 
-// maps the next 20 locations
-func commandMap(c *config) error {
-	if c.Next == nil {
+func commandMap(cfg *pokeapi.Config) error {
+	if cfg.UrlNext == nil {
 		_, err := fmt.Println("You are already on the last page")
 		return err
 	}
 
-	// is it dereferencing??
-	data, err := pokeapi.GetAreaData(*c.Next)
+	data, err := cfg.GetAreaData(*cfg.UrlNext)
 	if err != nil {
 		return err
 	}
@@ -91,20 +83,19 @@ func commandMap(c *config) error {
 		}
 	}
 
-	c.Next = data.Next
-	c.Previous = data.Previous
+	cfg.UrlNext = data.Next
+	cfg.UrlPrevious = data.Previous
 
 	return nil
 }
 
-// maps the previous 20 locations
-func commandMapB(c *config) error {
-	if c.Previous == nil {
+func commandMapB(cfg *pokeapi.Config) error {
+	if cfg.UrlPrevious == nil {
 		_, err := fmt.Println("You are already on the first page")
 		return err
 	}
 
-	data, err := pokeapi.GetAreaData(*c.Previous)
+	data, err := cfg.GetAreaData(*cfg.UrlPrevious)
 	if err != nil {
 		return err
 	}
@@ -116,8 +107,8 @@ func commandMapB(c *config) error {
 		}
 	}
 
-	c.Next = data.Next
-	c.Previous = data.Previous
+	cfg.UrlNext = data.Next
+	cfg.UrlPrevious = data.Previous
 
 	return nil
 }
