@@ -10,7 +10,7 @@ import (
 type cliCommand struct {
 	name        string
 	description string
-	callback    func(*pokeapi.Config) error
+	callback    func(*pokeapi.Config, string) error
 }
 
 func getCommands() map[string]cliCommand {
@@ -27,25 +27,30 @@ func getCommands() map[string]cliCommand {
 		},
 		"map": {
 			name:        "map",
-			description: "Get the next page of areas",
+			description: "Get the next page of locations",
 			callback:    commandMap,
 		},
 		"mapb": {
 			name:        "mapb",
-			description: "Get the previous page of areas",
+			description: "Get the previous page of locations",
 			callback:    commandMapB,
+		},
+		"explore": {
+			name:        "explore",
+			description: "Explore a location",
+			callback:    commandExplore,
 		},
 	}
 }
 
-func commandExit(cfg *pokeapi.Config) error {
+func commandExit(cfg *pokeapi.Config, s string) error {
 	_, err := fmt.Println("Closing the Pokedex... Goodbye!")
 
 	os.Exit(0)
 	return err
 }
 
-func commandHelp(cfg *pokeapi.Config) error {
+func commandHelp(cfg *pokeapi.Config, s string) error {
 	_, err := fmt.Printf("Welcome to the Pokedex!\nUsage:\n\n")
 	if err != nil {
 		return err
@@ -63,7 +68,7 @@ func commandHelp(cfg *pokeapi.Config) error {
 	return nil
 }
 
-func commandMap(cfg *pokeapi.Config) error {
+func commandMap(cfg *pokeapi.Config, s string) error {
 	if cfg.UrlNext == nil {
 		_, err := fmt.Println("You are already on the last page")
 		return err
@@ -87,7 +92,7 @@ func commandMap(cfg *pokeapi.Config) error {
 	return nil
 }
 
-func commandMapB(cfg *pokeapi.Config) error {
+func commandMapB(cfg *pokeapi.Config, s string) error {
 	if cfg.UrlPrevious == nil {
 		_, err := fmt.Println("You are already on the first page")
 		return err
@@ -107,6 +112,24 @@ func commandMapB(cfg *pokeapi.Config) error {
 
 	cfg.UrlNext = data.Next
 	cfg.UrlPrevious = data.Previous
+
+	return nil
+}
+
+func commandExplore(cfg *pokeapi.Config, areaName string) error {
+	// access pokemon: locationData.PokemonEncounters[i].Name (string)
+	data, err := cfg.GetLocationData(areaName)
+	if err != nil {
+		return err
+	}
+	fmt.Println("Found Pokemon:")
+	for _, pokemon := range data.PokemonEncounters {
+		name := pokemon.Pokemon.Name
+		_, err := fmt.Printf("- %s\n", name)
+		if err != nil {
+			return err
+		}
+	}
 
 	return nil
 }

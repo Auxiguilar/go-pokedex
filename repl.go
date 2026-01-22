@@ -41,8 +41,13 @@ func startRepl() {
 		}
 
 		userCmd := cleanedInput[0]
+		cmdArg := ""
+		if len(cleanedInput) > 1 {
+			cmdArg = cleanedInput[1]
+		}
+
 		if cmd, ok := availableCmds[userCmd]; ok {
-			err := cmd.callback(&config)
+			err := cmd.callback(&config, cmdArg)
 			if err != nil {
 				fmt.Println(err)
 			}
