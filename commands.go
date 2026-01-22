@@ -43,8 +43,13 @@ func getCommands() map[string]cliCommand {
 		},
 		"catch": {
 			name:        "catch",
-			description: "Catch a pokemon",
+			description: "Catch a Pokemon",
 			callback:    commandCatch,
+		},
+		"inspect": {
+			name:        "inspect",
+			description: "Inspect a Pokemon you have caught",
+			callback:    commandInspect,
 		},
 	}
 }
@@ -159,6 +164,29 @@ func commandCatch(cfg *pokeapi.Config, pokeName string) error {
 	// success
 	fmt.Printf("%s was caught!\n", data.Name)
 	cfg.Pokemon[data.Name] = data
+
+	return nil
+}
+
+func commandInspect(cfg *pokeapi.Config, pokeName string) error {
+	pokemon, ok := cfg.Pokemon[pokeName]
+	if !ok {
+		_, err := fmt.Println("You have not caught that pokemon yet")
+		return err
+	}
+
+	// no, I guess I won't be checking err...
+	fmt.Printf("Name: %s\n", pokemon.Name)
+	fmt.Printf("Height: %d\n", pokemon.Height)
+	fmt.Printf("Weight: %d\n", pokemon.Weight)
+	fmt.Printf("Stats:\n")
+	for _, stat := range pokemon.Stats {
+		fmt.Printf("  - %s: %d\n", stat.Stat.Name, stat.BaseStat)
+	}
+	fmt.Printf("Types:\n")
+	for _, t := range pokemon.Types {
+		fmt.Printf("  - %s\n", t.Type.Name)
+	}
 
 	return nil
 }
