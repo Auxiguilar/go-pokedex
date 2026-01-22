@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 	"os"
 
 	"github.com/Auxiguilar/go-pokedex/internal/pokeapi"
@@ -40,6 +41,11 @@ func getCommands() map[string]cliCommand {
 			description: "Explore a location",
 			callback:    commandExplore,
 		},
+		"catch": {
+			name:        "catch",
+			description: "Catch a pokemon",
+			callback:    commandCatch,
+		},
 	}
 }
 
@@ -76,7 +82,7 @@ func commandMap(cfg *pokeapi.Config, s string) error {
 
 	data, err := cfg.GetAreaData(*cfg.UrlNext)
 	if err != nil {
-		return err
+		return fmt.Errorf("Getting area data: %w", err)
 	}
 
 	for _, result := range data.Results {
@@ -100,7 +106,7 @@ func commandMapB(cfg *pokeapi.Config, s string) error {
 
 	data, err := cfg.GetAreaData(*cfg.UrlPrevious)
 	if err != nil {
-		return err
+		return fmt.Errorf("Getting area data: %w", err)
 	}
 
 	for _, result := range data.Results {
@@ -120,8 +126,9 @@ func commandExplore(cfg *pokeapi.Config, areaName string) error {
 	// access pokemon: locationData.PokemonEncounters[i].Name (string)
 	data, err := cfg.GetLocationData(areaName)
 	if err != nil {
-		return err
+		return fmt.Errorf("Getting location data: %w", err)
 	}
+
 	fmt.Println("Found Pokemon:")
 	for _, pokemon := range data.PokemonEncounters {
 		name := pokemon.Pokemon.Name
@@ -130,6 +137,28 @@ func commandExplore(cfg *pokeapi.Config, areaName string) error {
 			return err
 		}
 	}
+
+	return nil
+}
+
+func commandCatch(cfg *pokeapi.Config, pokeName string) error {
+	// access pokemon: pokemonData.Name
+	data, err := cfg.GetPokemonData(pokeName)
+	if err != nil {
+		return fmt.Errorf("Getting pokemon data: %w", err)
+	}
+
+	fmt.Printf("Throwing a Pokeball at %s...\n", data.Name)
+
+	// failure
+	if rand.Intn(1000) < data.BaseExperience {
+		fmt.Printf("%s escaped!\n", data.Name)
+		return nil
+	}
+
+	// success
+	fmt.Printf("%s was caught!\n", data.Name)
+	cfg.Pokemon[data.Name] = data
 
 	return nil
 }

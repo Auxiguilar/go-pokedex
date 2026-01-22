@@ -49,7 +49,7 @@ func startRepl() {
 		if cmd, ok := availableCmds[userCmd]; ok {
 			err := cmd.callback(&config, cmdArg)
 			if err != nil {
-				fmt.Println(err)
+				fmt.Printf("Error calling command: %v\n", err)
 			}
 		} else {
 			fmt.Println("Unknown command")
