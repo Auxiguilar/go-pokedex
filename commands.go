@@ -28,12 +28,12 @@ func getCommands() map[string]cliCommand {
 		},
 		"map": {
 			name:        "map",
-			description: "Get the next page of locations",
+			description: "Get the next page of locations to explore",
 			callback:    commandMap,
 		},
 		"mapb": {
 			name:        "mapb",
-			description: "Get the previous page of locations",
+			description: "Get the previous page of locations to explore",
 			callback:    commandMapB,
 		},
 		"explore": {
@@ -48,26 +48,26 @@ func getCommands() map[string]cliCommand {
 		},
 		"inspect": {
 			name:        "inspect",
-			description: "Inspect a Pokemon you have caught",
+			description: "Inspect a Pokemon in your Pokedex",
 			callback:    commandInspect,
 		},
 		"pokedex": {
 			name:        "pokedex",
-			description: "View your pokedex",
+			description: "View your Pokedex; the Pokemon you have caught",
 			callback:    commandPokedex,
 		},
 	}
 }
 
 func commandExit(cfg *pokeapi.Config, s string) error {
-	_, err := fmt.Println("Closing the Pokedex... Goodbye!")
+	_, err := fmt.Printf("Closing the Pokedex... Goodbye!\n")
 
 	os.Exit(0)
 	return err
 }
 
 func commandHelp(cfg *pokeapi.Config, s string) error {
-	_, err := fmt.Printf("Welcome to the Pokedex!\nUsage:\n\n")
+	_, err := fmt.Printf("Welcome to the Pokedex!\n\nUsage:\n")
 	if err != nil {
 		return err
 	}
@@ -86,7 +86,7 @@ func commandHelp(cfg *pokeapi.Config, s string) error {
 
 func commandMap(cfg *pokeapi.Config, s string) error {
 	if cfg.UrlNext == nil {
-		_, err := fmt.Println("You are already on the last page")
+		_, err := fmt.Println("You are on the last page")
 		return err
 	}
 
@@ -110,7 +110,7 @@ func commandMap(cfg *pokeapi.Config, s string) error {
 
 func commandMapB(cfg *pokeapi.Config, s string) error {
 	if cfg.UrlPrevious == nil {
-		_, err := fmt.Println("You are already on the first page")
+		_, err := fmt.Println("You are on the first page")
 		return err
 	}
 
@@ -133,7 +133,11 @@ func commandMapB(cfg *pokeapi.Config, s string) error {
 }
 
 func commandExplore(cfg *pokeapi.Config, areaName string) error {
-	// access pokemon: locationData.PokemonEncounters[i].Name (string)
+	if areaName == "" {
+		fmt.Println("Usage: explore <area name>")
+		return fmt.Errorf("Missing argument")
+	}
+
 	data, err := cfg.GetLocationData(areaName)
 	if err != nil {
 		return fmt.Errorf("Getting location data: %w", err)
@@ -152,7 +156,11 @@ func commandExplore(cfg *pokeapi.Config, areaName string) error {
 }
 
 func commandCatch(cfg *pokeapi.Config, pokeName string) error {
-	// access pokemon: pokemonData.Name
+	if pokeName == "" {
+		fmt.Println("Usage: catch <pokemon name>")
+		return fmt.Errorf("Missing argument")
+	}
+
 	data, err := cfg.GetPokemonData(pokeName)
 	if err != nil {
 		return fmt.Errorf("Getting pokemon data: %w", err)
@@ -174,9 +182,14 @@ func commandCatch(cfg *pokeapi.Config, pokeName string) error {
 }
 
 func commandInspect(cfg *pokeapi.Config, pokeName string) error {
+	if pokeName == "" {
+		fmt.Println("Usage: inspect <pokemon name>")
+		return fmt.Errorf("Missing argument")
+	}
+
 	pokemon, ok := cfg.Pokemon[pokeName]
 	if !ok {
-		_, err := fmt.Println("You have not caught that pokemon yet")
+		_, err := fmt.Println("No pokemon by that name in the Pokedex")
 		return err
 	}
 

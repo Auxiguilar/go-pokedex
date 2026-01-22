@@ -30,8 +30,16 @@ func startRepl() {
 
 	config := pokeapi.NewConfig()
 
+	fmt.Print(
+		"List available locations with 'map' and 'mapb',\n",
+		"then 'explore' one that catches your eye for Pokemon\n",
+		"to 'catch' and add to your 'pokedex'!\n\n",
+		"You may 'inspect' any Pokemon you've caught.\n\n",
+		"Use 'help' to see available commands.\n",
+	)
+
 	for {
-		fmt.Print("pokedex > ")
+		fmt.Print("\npokedex > ")
 		scanner.Scan()
 		input := scanner.Text()
 
